@@ -1,10 +1,119 @@
-import React from 'react';
-import './index.scss';
+import React, { useState } from "react";
+import "./index.scss";
 
 const Home = () => {
+  const ingredients = [
+    "rice",
+    "ground beef",
+    "steak",
+    "chicken thighs",
+    "salmon",
+    "potatoes",
+    "black beans",
+    "flour tortillas",
+    "heavy cream",
+    "carrots",
+    "onions",
+  ];
+  const [cart, setCart] = useState([]);
+  const [options, setOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const styles = {
+    loading: {
+      position: "absolute",
+      height: "100vh",
+      width: "100vw",
+      top: "0",
+      left: "0",
+      backgroundColor: "rgba(0,0,0,0.75)",
+    },
+  };
+
+  const selectHandler = (e) => {
+    e.target.selected = !e.target.selected;
+    const selected = e.target.selected;
+
+    // UPDATE CART
+    const updateCart = selected
+      ? [...cart, e.target.innerText]
+      : cart.filter((item) => item !== e.target.innerText);
+    setCart([...updateCart]);
+
+    // UPDATE CLASS
+    if (selected) e.target.classList.add("selected");
+    else e.target.classList.remove("selected");
+  };
+  const clearSelected = () => {
+    const allIngredients = document.querySelectorAll(".ingredient");
+
+    allIngredients.forEach((ingredient) => {
+      if (ingredient.selected) {
+        ingredient.selected = false;
+        ingredient.classList.remove("selected");
+      }
+    });
+    setCart([]);
+  };
+  const generateIdeas = async () => {
+    if (cart.lenght === 0) return alert("Select at least one ingredient");
+
+    setLoading(true);
+    const url = "/openai/recipeideas";
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ingredients: [...cart] }),
+    });
+    if (!res.ok) {
+      alert("ERROR processing request");
+      return setLoading(false);
+    }
+    const result = await res.json(res);
+    setOptions(result.options);
+    clearSelected();
+    return setLoading(false);
+  };
   return (
     <div id="Home">
-      <h1>Home</h1>
+      {loading && (
+        <div style={styles.loading}>
+          <h1>Loading...</h1>
+        </div>
+      )}
+      <h1>Meal Maker</h1>
+      <h2>Ingredients</h2>
+      <h4>Select your available ingredients:</h4>
+      <div>
+        {ingredients.map((item) => (
+          <div
+            key={item}
+            value={item}
+            selected={false}
+            className={`ingredient`}
+            onClick={selectHandler}
+          >
+            {item}
+          </div>
+        ))}
+      </div>
+
+      <button className="submit" onClick={generateIdeas}>
+        Generate Ideas
+      </button>
+      <button className="clear" onClick={clearSelected}>
+        Clear Cart
+      </button>
+
+      <div>
+        <h2>Ideas</h2>
+        <h4>Select an option for the full recipe:</h4>
+        {options.map((option) => (
+          <div key={option.name} className="option">
+            <h3>{option.name}</h3>
+            <p>{option.description}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

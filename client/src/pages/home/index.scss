@@ -1,3 +1,34 @@
 #Home {
   color: var(--blue1);
+  .ingredient {
+    padding: 1em;
+    cursor: pointer;
+
+    &.selected {
+      background-color: green;
+      color: white;
+    }
+  }
+
+  button {
+    margin-top: 1em;
+    padding: 1em;
+    &.submit {
+      background-color: green;
+      color: white;
+    }
+    &.clear {
+      background-color: orange;
+      color: white;
+    }
+  }
+
+  .option {
+    cursor: pointer;
+    padding: 1em 2em;
+    &:hover {
+      color: var(--white);
+      background-color: var(--blue2);
+    }
+  }
 }

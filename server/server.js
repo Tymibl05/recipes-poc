@@ -1,8 +1,9 @@
-import express from 'express';
-import cors from 'cors';
-import * as dotenv from 'dotenv';
-import path from 'path';
+import express from "express";
+import cors from "cors";
+import * as dotenv from "dotenv";
+import path from "path";
 // import { connectDb } from './db/mongo.js';
+import openaiRouter from "./routes/openAI/router.js";
 
 //** CONFIG */
 dotenv.config();
@@ -16,12 +17,13 @@ app.listen(port, () => {
 });
 
 //** ROUTES */
-app.get('/api', async (req, res) => res.send('API'));
+app.get("/api", async (req, res) => res.send("API"));
+app.use("/openai", openaiRouter);
 
 //** SSR */
-const dir = path.resolve();
-const __dirname = dir.slice(0, -7); // removes /server from pathname
-app.use(express.static(path.join(__dirname, './client/build')));
-app.get('*', (req, res) =>
-  res.sendFile(path.join(__dirname, './client/build/index.html'))
-);
+// const dir = path.resolve();
+// const __dirname = dir.slice(0, -7); // removes /server from pathname
+// app.use(express.static(path.join(__dirname, "./client/build")));
+// app.get("*", (req, res) =>
+//   res.sendFile(path.join(__dirname, "./client/build/index.html"))
+// );
